@@ -42,7 +42,12 @@ module BitmaskAttribute
       end
     end
     
+    def symbolize!
+      map!(&:to_sym)
+    end
+    
     def updated!
+      symbolize!
       validate!
       uniq!
       serialize!

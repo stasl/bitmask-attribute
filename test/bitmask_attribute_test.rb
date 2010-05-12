@@ -97,6 +97,12 @@ class BitmaskAttributeTest < Test::Unit::TestCase
       assert_stored campaign, :web, :print
     end
     
+    should "convert values passed as strings to symbols" do
+      campaign = Campaign.new
+      campaign.medium << "web"
+      assert_equal [:web], campaign.medium
+    end
+        
     context "checking" do
 
       setup { @campaign = Campaign.new(:medium => [:web, :print]) }
