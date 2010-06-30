@@ -101,6 +101,7 @@ class BitmaskAttributeTest < Test::Unit::TestCase
       campaign = Campaign.new
       campaign.medium << "web"
       assert_equal [:web], campaign.medium
+      assert_equal true, campaign.medium?("web")
     end
         
     context "checking" do

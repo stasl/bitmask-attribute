@@ -91,7 +91,7 @@ module BitmaskAttribute
         def #{attribute}?(*values)
           if !values.blank?
             values.all? do |value|
-              self.#{attribute}.include?(value)
+              self.#{attribute}.include?(value.to_sym)
             end
           else
             self.#{attribute}.present?
