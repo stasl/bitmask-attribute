@@ -24,6 +24,10 @@ module BitmaskAttribute
     private
     #######
 
+    def scope_method
+      ActiveRecord::VERSION::STRING >= "3" ? :scope : :named_scope
+    end
+
     def validate_for(model)
       # The model cannot be validated if it is preloaded and the attribute/column is not in the
       # database (the migration has not been run).  This usually
@@ -102,7 +106,7 @@ module BitmaskAttribute
     
     def create_named_scopes_on(model)
       model.class_eval %(
-        named_scope :with_#{attribute},
+        #{scope_method} :with_#{attribute},
           proc { |*values|
             if values.blank?
               {:conditions => '#{attribute} > 0 OR #{attribute} IS NOT NULL'}
@@ -114,13 +118,13 @@ module BitmaskAttribute
               {:conditions => sets.join(' AND ')}
             end
           }
-        named_scope :without_#{attribute}, :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
-        named_scope :no_#{attribute},      :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
+        #{scope_method} :without_#{attribute}, :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
+        #{scope_method} :no_#{attribute},      :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
       )
       values.each do |value|
         model.class_eval %(
-          named_scope :#{attribute}_for_#{value},
-                      :conditions => ['#{attribute} & ? <> 0', #{model}.bitmask_for_#{attribute}(:#{value})]
+          #{scope_method} :#{attribute}_for_#{value},
+                          :conditions => ['#{attribute} & ? <> 0', #{model}.bitmask_for_#{attribute}(:#{value})]
         )
       end      
     end
@@ -152,3 +156,5 @@ module BitmaskAttribute
   end
   
 end
+
+ActiveRecord::Base.send :include, BitmaskAttribute if defined? ActiveRecord::Base
