@@ -1,4 +1,8 @@
 require 'bitmask_attribute/value_proxy'
+require 'bitmask_attribute/attribute'
+require 'bitmask_attribute/core_ext/hash_with_indifferent_access' unless defined?(HashWithIndifferentAccess)
+require 'bitmask_attribute/core_ext/returning' unless Object.respond_to?(:returning)
+require 'bitmask_attribute/core_ext/blank' unless Object.respond_to?(:blank?)
 
 module BitmaskAttribute
   
@@ -17,16 +21,12 @@ module BitmaskAttribute
       override model
       create_convenience_class_method_on(model)
       create_convenience_instance_methods_on(model)
-      create_named_scopes_on(model)
+      create_named_scopes_on(model) if defined?(ActiveRecord::Base) && model.respond_to?(scope_method)
     end
     
     #######
     private
     #######
-
-    def scope_method
-      ActiveRecord::VERSION::STRING >= "3" ? :scope : :named_scope
-    end
 
     def validate_for(model)
       # The model cannot be validated if it is preloaded and the attribute/column is not in the
@@ -34,7 +34,7 @@ module BitmaskAttribute
       # occurs in the 'test' and 'production' environments.
       return if defined?(Rails) && Rails.configuration.cache_classes
 
-      unless model.columns.detect { |col| col.name == attribute.to_s }
+      unless !model.respond_to?(:columns) || model.columns.detect { |col| col.name == attribute.to_s }
         raise ArgumentError, "`#{attribute}' is not an attribute of `#{model}'"
       end
     end
@@ -103,7 +103,11 @@ module BitmaskAttribute
         end
       )
     end
-    
+
+    def scope_method
+      ActiveRecord::VERSION::STRING >= "3" ? :scope : :named_scope
+    end
+
     def create_named_scopes_on(model)
       model.class_eval %(
         #{scope_method} :with_#{attribute},
@@ -130,11 +134,14 @@ module BitmaskAttribute
     end
     
   end
-  
+
   def self.included(model)
     model.extend ClassMethods
+    # Include basic attributes support for clean class
+    # TODO improve attributes detection
+    model.send(:include, BitmaskAttribute::Attribute) unless model.included_modules.detect{|m| m.to_s.include? 'AttributeMethods'}
   end
-    
+
   module ClassMethods
     
     def bitmask(attribute, options={}, &extension)

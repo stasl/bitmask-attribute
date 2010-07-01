@@ -5,11 +5,13 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "bitmask-attribute"
-    gem.summary = %Q{Simple bitmask attribute support for ActiveRecord}
+    gem.summary = %Q{Simple bitmask attribute support for any class}
     gem.email = "bruce@codefluency.com"
     gem.homepage = "http://github.com/bruce/bitmask-attribute"
     gem.authors = ["Bruce Williams"]
-    gem.add_dependency 'activerecord'
+    gem.add_development_dependency 'activerecord'
+    gem.add_development_dependency 'sqlite3-ruby'
+    gem.add_development_dependency "shoulda"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
