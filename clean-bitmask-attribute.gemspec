@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{clean-bitmask-attribute}
-  s.version = "2.0.0"
+  s.version = "2.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Pavel Chipiga", "Bruce Williams"]
-  s.date = %q{2010-07-05}
+  s.date = %q{2010-08-26}
   s.email = %q{pavel.chipiga@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -22,12 +22,12 @@ Gem::Specification.new do |s|
      "README.markdown",
      "Rakefile",
      "VERSION",
+     "clean-bitmask-attribute.gemspec",
      "lib/bitmask-attribute.rb",
      "lib/bitmask_attribute.rb",
      "lib/bitmask_attribute/attribute.rb",
      "lib/bitmask_attribute/core_ext/blank.rb",
      "lib/bitmask_attribute/core_ext/hash_with_indifferent_access.rb",
-     "lib/bitmask_attribute/core_ext/returning.rb",
      "lib/bitmask_attribute/value_proxy.rb",
      "rails/init.rb",
      "test/bitmask_attribute_test.rb",
