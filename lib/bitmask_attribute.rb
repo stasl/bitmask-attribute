@@ -1,7 +1,6 @@
 require 'bitmask_attribute/value_proxy'
 require 'bitmask_attribute/attribute'
 require 'bitmask_attribute/core_ext/hash_with_indifferent_access' unless defined?(HashWithIndifferentAccess)
-require 'bitmask_attribute/core_ext/returning' unless Object.respond_to?(:returning)
 require 'bitmask_attribute/core_ext/blank' unless Object.respond_to?(:blank?)
 
 module BitmaskAttribute
@@ -35,7 +34,7 @@ module BitmaskAttribute
     end
     
     def generate_bitmasks_on(model)
-      model.bitmasks[attribute] = returning HashWithIndifferentAccess.new do |mapping|
+      model.bitmasks[attribute] = HashWithIndifferentAccess.new.tap do |mapping|
         values.each_with_index do |value, index|
           mapping[value] = 0b1 << index
         end
