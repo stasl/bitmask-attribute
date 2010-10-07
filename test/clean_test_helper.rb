@@ -1,14 +1,8 @@
 require 'rubygems'
 require 'test/unit'
 require 'shoulda'
-
-require 'active_support'
-require 'active_support/core_ext/object'
-require 'active_record'
-
 begin
   require 'redgreen'
-  require 'active_support/hash_with_indifferent_access'
 rescue LoadError
 end
 
@@ -17,30 +11,9 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'bitmask-attribute'
 require File.dirname(__FILE__) + '/../rails/init'
 
-# ActiveRecord::Base.logger = Logger.new(STDOUT)
-
-ActiveRecord::Base.establish_connection(
-  :adapter  => 'sqlite3',
-  :database => ':memory:'
-)
-
-ActiveRecord::Schema.define do 
-  create_table :campaigns do |t|
-    t.integer :company_id
-    t.integer :medium, :misc, :Legacy
-  end
-  create_table :companies do |t|
-    t.string :name
-  end
-end
-
-class Company < ActiveRecord::Base
-  has_many :campaigns
-end
-
 # Pseudo model for testing purposes
-class Campaign < ActiveRecord::Base
-  belongs_to :company
+class CleanCampaign
+  include BitmaskAttribute
   bitmask :medium, :as => [:web, :print, :email, :phone]
   bitmask :misc, :as => %w(some useless values) do
     def worked?
@@ -55,7 +28,7 @@ class Test::Unit::TestCase
   def assert_unsupported(&block)
     assert_raises(ArgumentError, &block)
   end
-  
+
   def assert_stored(record, *values)
     values.each do |value|
       assert record.medium.any? { |v| v.to_s == value.to_s }, "Values #{record.medium.inspect} does not include #{value.inspect}"
@@ -65,5 +38,5 @@ class Test::Unit::TestCase
     end
     assert_equal full_mask, record.medium.to_i
   end
-  
+
 end
