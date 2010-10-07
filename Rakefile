@@ -4,10 +4,10 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "clean-bitmask-attribute"
+    gem.name = "bitmask-attribute"
     gem.summary = %Q{Simple bitmask attribute support for any class}
     gem.email = "pavel.chipiga@gmail.com"
-    gem.homepage = "http://github.com/chipiga/bitmask-attribute/tree/clean"
+    gem.homepage = "http://github.com/fullsailor/bitmask-attribute"
     gem.authors = ["Pavel Chipiga", "Bruce Williams"]
     gem.add_development_dependency 'activerecord'
     gem.add_development_dependency 'sqlite3-ruby'
