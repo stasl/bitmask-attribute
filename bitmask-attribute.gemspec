@@ -4,8 +4,8 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{clean-bitmask-attribute}
-  s.version = "2.0.1"
+  s.name = %q{bitmask-attribute}
+  s.version = "2.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Pavel Chipiga", "Bruce Williams"]
@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
      "README.markdown",
      "Rakefile",
      "VERSION",
-     "clean-bitmask-attribute.gemspec",
+     "bitmask-attribute.gemspec",
      "lib/bitmask-attribute.rb",
      "lib/bitmask_attribute.rb",
      "lib/bitmask_attribute/attribute.rb",
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
      "test/clean_test_helper.rb",
      "test/test_helper.rb"
   ]
-  s.homepage = %q{http://github.com/chipiga/bitmask-attribute/tree/clean}
+  s.homepage = %q{http://github.com/fullsailor/bitmask-attribute/}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
