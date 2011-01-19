@@ -109,11 +109,8 @@ module BitmaskAttribute
             if values.blank?
               {:conditions => '#{attribute} > 0 OR #{attribute} IS NOT NULL'}
             else
-              sets = values.map do |value|
-                mask = #{model}.bitmask_for_#{attribute}(value)
-                "#{attribute} & \#{mask} <> 0"
-              end
-              {:conditions => sets.join(' AND ')}
+              mask = #{model}.bitmask_for_#{attribute}(*values)
+              {:conditions =>"#{attribute} & \#{mask} = \#{mask}"}
             end
           }
         #{scope_method} :without_#{attribute}, :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
