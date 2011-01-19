@@ -113,6 +113,11 @@ module BitmaskAttribute
               {:conditions =>"#{attribute} & \#{mask} = \#{mask}"}
             end
           }
+        #{scope_method} :with_#{attribute}_in,
+          proc { |value, *other_values|
+            mask = #{model}.bitmask_for_#{attribute}(value, *other_values)
+            {:conditions => "#{attribute} & \#{mask} <> 0"}
+          }
         #{scope_method} :without_#{attribute}, :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
         #{scope_method} :no_#{attribute},      :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
       )
