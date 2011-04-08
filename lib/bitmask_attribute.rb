@@ -118,8 +118,8 @@ module BitmaskAttribute
             mask = #{model}.bitmask_for_#{attribute}(value, *other_values)
             {:conditions => "#{attribute} & \#{mask} <> 0"}
           }
-        #{scope_method} :without_#{attribute}, :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
-        #{scope_method} :no_#{attribute},      :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
+        #{scope_method} :without_#{attribute}, :conditions => "#{attribute} = 0 OR #{attribute} IS NULL"
+        #{scope_method} :no_#{attribute},      :conditions => "#{attribute} = 0 OR #{attribute} IS NULL"
       )
       values.each do |value|
         model.class_eval %(
