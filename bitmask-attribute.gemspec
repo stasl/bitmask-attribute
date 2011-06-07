@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Bitmask::Attribute::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Jason L. Perry", "Nicolas Fouce", "Wojtek Mach"]
-  s.email       = ["TODO: Write your email address"]
+  s.email       = ["wojtekmach1@gmail.com"]
   s.homepage    = ""
   s.summary     = %q{Transparent manipulation of bitmask attributes.}
 
