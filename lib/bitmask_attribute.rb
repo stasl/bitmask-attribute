@@ -1,7 +1,4 @@
 require 'bitmask_attribute/value_proxy'
-require 'bitmask_attribute/attribute'
-require 'bitmask_attribute/core_ext/hash_with_indifferent_access' unless defined?(HashWithIndifferentAccess)
-require 'bitmask_attribute/core_ext/blank' unless Object.respond_to?(:blank?)
 
 module BitmaskAttribute
   
@@ -20,7 +17,7 @@ module BitmaskAttribute
       override model
       create_convenience_class_method_on(model)
       create_convenience_instance_methods_on(model)
-      create_named_scopes_on(model) if defined?(ActiveRecord::Base) && model.respond_to?(scope_method)
+      create_scopes_on(model)
     end
     
     #######
@@ -28,7 +25,12 @@ module BitmaskAttribute
     #######
 
     def validate_for(model)
-      unless (model.columns.detect { |col| col.name == attribute.to_s } rescue true)
+      # The model cannot be validated if it is preloaded and the attribute/column is not in the
+      # database (the migration has not been run).  This usually
+      # occurs in the 'test' and 'production' environments.
+      return if defined?(Rails) && Rails.configuration.cache_classes
+
+      unless model.columns.detect { |col| col.name == attribute.to_s }
         raise ArgumentError, "`#{attribute}' is not an attribute of `#{model}'"
       end
     end
@@ -89,7 +91,7 @@ module BitmaskAttribute
         def #{attribute}?(*values)
           if !values.blank?
             values.all? do |value|
-              self.#{attribute}.include?(value.to_sym)
+              self.#{attribute}.include?(value)
             end
           else
             self.#{attribute}.present?
@@ -97,47 +99,38 @@ module BitmaskAttribute
         end
       )
     end
-
-    def scope_method
-      ActiveRecord::VERSION::STRING >= "3" ? :scope : :named_scope
-    end
-
-    def create_named_scopes_on(model)
+    
+    def create_scopes_on(model)
       model.class_eval %(
-        #{scope_method} :with_#{attribute},
+        scope :with_#{attribute},
           proc { |*values|
             if values.blank?
               {:conditions => '#{attribute} > 0 OR #{attribute} IS NOT NULL'}
             else
-              mask = #{model}.bitmask_for_#{attribute}(*values)
-              {:conditions =>"#{attribute} & \#{mask} = \#{mask}"}
+              sets = values.map do |value|
+                mask = #{model}.bitmask_for_#{attribute}(value)
+                "#{attribute} & \#{mask} <> 0"
+              end
+              {:conditions => sets.join(' AND ')}
             end
           }
-        #{scope_method} :with_#{attribute}_in,
-          proc { |value, *other_values|
-            mask = #{model}.bitmask_for_#{attribute}(value, *other_values)
-            {:conditions => "#{attribute} & \#{mask} <> 0"}
-          }
-        #{scope_method} :without_#{attribute}, :conditions => "#{attribute} = 0 OR #{attribute} IS NULL"
-        #{scope_method} :no_#{attribute},      :conditions => "#{attribute} = 0 OR #{attribute} IS NULL"
+        scope :without_#{attribute}, :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
+        scope :no_#{attribute},      :conditions => "#{attribute} == 0 OR #{attribute} IS NULL"
       )
       values.each do |value|
         model.class_eval %(
-          #{scope_method} :#{attribute}_for_#{value},
-                          :conditions => ['#{attribute} & ? <> 0', #{model}.bitmask_for_#{attribute}(:#{value})]
+          scope :#{attribute}_for_#{value},
+                :conditions => ['#{attribute} & ? <> 0', #{model}.bitmask_for_#{attribute}(:#{value})]
         )
       end      
     end
     
   end
-
+  
   def self.included(model)
     model.extend ClassMethods
-    # Include basic attributes support for clean class
-    # TODO improve attributes detection
-    model.send(:include, BitmaskAttribute::Attribute) unless model.included_modules.detect{|m| m.to_s.include? 'AttributeMethods'}
   end
-
+    
   module ClassMethods
     
     def bitmask(attribute, options={}, &extension)
@@ -159,5 +152,3 @@ module BitmaskAttribute
   end
   
 end
-
-ActiveRecord::Base.send :include, BitmaskAttribute if defined? ActiveRecord::Base
