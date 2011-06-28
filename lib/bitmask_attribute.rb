@@ -97,6 +97,8 @@ module BitmaskAttribute
             self.#{attribute}.present?
           end
         end
+
+        alias has_role? #{attribute}?
       )
     end
     
